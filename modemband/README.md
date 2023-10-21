@@ -1,4 +1,4 @@
-Setting LTE bands for selected modems.
+Setting LTE/5G NSA/5G SA bands for selected modems.
 
 Supported devices:
 - BroadMobi BM806U
@@ -6,6 +6,8 @@ Supported devices:
 - Fibocom L850-GL
 - Fibocom L850-GL in mbim mode
 - Fibocom L860-GL
+- HP lt4112 (Huawei ME906E)
+- HP lt4132 LTE/HSPA+ 4G Module (Huawei ME906s-158)
 - HP lt4220 (Foxconn T77W676)
 - HP lt4220 (Foxconn T77W676) in mbim mode
 - Huawei (various models) in serial mode
@@ -16,25 +18,47 @@ Supported devices:
 - Quectel EM160R-GL
 - Quectel EP06-E
 - Quectel RG502Q-EA
+- Quectel RM500Q-GL
+- Quectel RM502Q-AE
+- Quectel RM520N-GL
+- Telit LM940
 - Telit LN940 (Foxconn T77W676)
 - Telit LN940 (Foxconn T77W676) in mbim mode
 - Telit LN960 (Foxconn T77W968)
+- Telit LN960
 - ZTE MF286 (router)
 - ZTE MF286C (router)
 - ZTE MF286D (router)
 - ZTE MF286R (router)
+- ZTE MF289R (router)
 
 ```
 root@MiFi:~# modemband.sh help
 Available commands:
  /usr/bin/modemband.sh getinfo
+ /usr/bin/modemband.sh json
+ /usr/bin/modemband.sh help
+
+for LTE modem
  /usr/bin/modemband.sh getsupportedbands
  /usr/bin/modemband.sh getsupportedbandsext
  /usr/bin/modemband.sh getbands
  /usr/bin/modemband.sh getbandsext
  /usr/bin/modemband.sh setbands "<band list>"
- /usr/bin/modemband.sh json
- /usr/bin/modemband.sh help
+
+for 5G NSA modem
+ /usr/bin/modemband.sh getsupportedbands5gnsa
+ /usr/bin/modemband.sh getsupportedbandsext5gnsa
+ /usr/bin/modemband.sh getbands5gnsa
+ /usr/bin/modemband.sh getbandsext5gnsa
+ /usr/bin/modemband.sh setbands5gnsa "<band list>"
+
+for 5G SA modem
+ /usr/bin/modemband.sh getsupportedbands5gsa
+ /usr/bin/modemband.sh getsupportedbandsext5gsa
+ /usr/bin/modemband.sh getbands5gsa
+ /usr/bin/modemband.sh getbandsext5gsa
+ /usr/bin/modemband.sh setbands5gsa "<band list>"
 
 root@MiFi:~# # modemband.sh
 Modem: Quectel EC25

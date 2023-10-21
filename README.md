@@ -5,7 +5,14 @@
 ![GitHub forks](https://img.shields.io/github/forks/4IceG/luci-app-modemband?style=flat-square)
 ![GitHub All Releases](https://img.shields.io/github/downloads/4IceG/luci-app-modemband/total)
 
-Luci-app-modemband is a My GUI for https://eko.one.pl/?p=openwrt-modemband. A program to set LTE bands for selected 4G modems.
+Luci-app-modemband is a My GUI for https://eko.one.pl/?p=openwrt-modemband. A program to set LTE/5G bands for selected 4G/5G modems.
+
+### <img src="https://raw.githubusercontent.com/4IceG/Personal_data/master/dooffy_design_icons_EU_flags_United_Kingdom.png" height="24"> What You Should Know / <img src="https://raw.githubusercontent.com/4IceG/Personal_data/master/dooffy_design_icons_EU_flags_Poland.png" height="24"> Co powinieneś wiedzieć
+> My package will not work if you are using ModemManager.   
+> Preferred version OpenWrt >= 21.02.
+
+> Mój pakiet nie będzie działać jeżeli uzywasz ModemManager-a.   
+> Preferowana wersja OpenWrt >= 21.02.
 
 ``` bash
 Supported devices:
@@ -14,10 +21,12 @@ Supported devices:
 - Fibocom L850-GL
 - Fibocom L850-GL in mbim mode
 - Fibocom L860-GL
+- HP lt4112 (Huawei ME906E)
 - HP lt4220 (Foxconn T77W676)
 - HP lt4220 (Foxconn T77W676) in mbim mode
 - Huawei (various models) in serial mode
   - Huawei E3272/E3372/E3276
+  - Huawei ME906E
   - Huawei ME906s
   - Huawei ME909s-120
   - Huawei ME909s-821
@@ -30,13 +39,19 @@ Supported devices:
 - Quectel EM160R-GL
 - Quectel EP06-E
 - Quectel RG502Q-EA
+- Quectel RM500Q-GL
+- Quectel RM502Q-AE
+- Quectel RM520N-GL
 - Telit LN940 (Foxconn T77W676)
 - Telit LN940 (Foxconn T77W676) in mbim mode
 - Telit LN960 (Foxconn T77W968)
+- Telit LN960
 - ZTE MF286 (router)
 - ZTE MF286C (router)
 - ZTE MF286D (router)
 - ZTE MF286R (router)
+- ZTE MF289F (router)
+
 ```
 
 Do you have another type of modem? Would you like to add support for it?
@@ -48,31 +63,142 @@ Send PR/mail with description:
 - an AT command to set specific bands
 - a list of all bands that can be set on the modem
 
+## <img src="https://raw.githubusercontent.com/4IceG/Personal_data/master/dooffy_design_icons_EU_flags_United_Kingdom.png" height="24"> Installation / <img src="https://raw.githubusercontent.com/4IceG/Personal_data/master/dooffy_design_icons_EU_flags_Poland.png" height="24"> Instalacja
+
+<details>
+   <summary>Pokaż | Show me</summary>
+
+#### Package dependencies for conventional modems.
+Modem drivers are required for proper operation.
 ``` bash
-#Modem drivers are required for proper operation.
-kmod-usb-serial kmod-usb-serial-option
+opkg install kmod-usb-serial kmod-usb-serial-option sms-tool
+```
+The sms-tool package is available in the OpenWrt Master repository.
 
-#+DEPENDS:
-sms-tool_2021-12-03-d38898f4-1 modemband_20220404
-
-#The sms-tool package is not available in the OpenWrt core repository. 
-#Sms-tool is only available in the eko.one.pl forum repository. 
-#If you do not have an image from forum eko.one.pl you have to compile the package manually.
-
-#For images from the eko.one.pl forum we proceed:
+#### Step 1a. Install sms-tool from Master (Only the current snapshot image).
+``` bash
 opkg update
 opkg install sms-tool
-
-Install app.
-wget https://github.com/4IceG/luci-app-modemband/releases/download/1.0.12-20220616/luci-app-modemband_1.0.12-20220616_all.ipk -O /tmp/luci-app-modemband_1.0.12-20220616_all.ipk
-opkg install /tmp/luci-app-modemband_1.0.12-20220616_all.ipk
-
 ```
 
-### <img src="https://raw.githubusercontent.com/4IceG/Personal_data/master/dooffy_design_icons_EU_flags_United_Kingdom.png" height="32"> Preview / <img src="https://raw.githubusercontent.com/4IceG/Personal_data/master/dooffy_design_icons_EU_flags_Poland.png" height="32"> Podgląd
+#### Step 1b. Download the sms-tool package and install manualy (For older stable version images).
 
-![](https://github.com/4IceG/Personal_data/blob/master/modemband20220306.gif?raw=true)
+   #### To install the sms-tool package, we need to know the architecture name for router.
+
+<details>
+   <summary>Pokaż jak znaleźć architekturę routera | Show how to find a router architecture.</summary>
+   
+
+   
+   > For example, we are looking for sms-tool for Zbtlink router ZBT-WE3526.   
+   
+   #### Step 1.
+   > We go to the page and enter the name of our router.  
+   https://firmware-selector.openwrt.org/
+   
+   
+   #### Step 2.
+   > Click on the folder icon and go to the image download page.   
+   
+   ![](https://github.com/4IceG/Personal_data/blob/master/OpenWrt%20Firmware%20Selector.png?raw=true)
+   
+   > It should take us to a page   
+   https://downloads.openwrt.org/snapshots/targets/ramips/mt7621/
+   
+   #### Step 3.
+   > Then go into the "packages" folder at the bottom of the page.   
+   https://downloads.openwrt.org/snapshots/targets/ramips/mt7621/packages/
+   
+   > We check what the architecture name is for our router. All packets have names ending in mipsel_24kc.ipk, so the architecture we are looking for is mipsel_24kc.
+   
+
+</details>
+
+#### Example of sms-tool installation using the command line.
+> In the link below, replace ```*architecture*``` with the architecture of your router, e.g. arm_cortex-a7_neon-vfpv4, mipsel_24kc.
+
+``` bash
+wget https://downloads.openwrt.org/snapshots/packages/*architecture*/packages/sms-tool_2022-03-21-f07699ab-1_*architecture*.ipk -O /tmp/sms-tool_2022-03-21.ipk
+opkg install /tmp/sms-tool_2022-03-21.ipk
+```
+
+#### Another way is to download the package manually.
+> To do this, we go to the page.   
+https://downloads.openwrt.org/snapshots/packages/
+
+> We choose our architecture, e.g. arm_cortex-a7_neon-vfpv4, mipsel_24kc.   
+https://downloads.openwrt.org/snapshots/packages/mipsel_24kc/
+
+> Go to the "packages" folder.   
+https://downloads.openwrt.org/snapshots/packages/mipsel_24kc/packages/
+
+> Looking for "sms-tool_2022-03-21". We can use search by using Ctr + F and typing "sms-tool".
+Save the package to your computer for further installation on the router.
+
+#### Step 2. Add my repository (https://github.com/4IceG/Modem-extras) to the image and follow the commands.
+``` bash
+opkg update
+opkg install luci-app-modemband
+```
+For images downloaded from eko.one.pl.
+Installation procedure is similar, only there is no need to manually download the sms-tool package.
+  
+</details>
+
+## <img src="https://raw.githubusercontent.com/4IceG/Personal_data/master/dooffy_design_icons_EU_flags_United_Kingdom.png" height="24"> User compilation / <img src="https://raw.githubusercontent.com/4IceG/Personal_data/master/dooffy_design_icons_EU_flags_Poland.png" height="24"> Kompilacja przez użytkownika
+
+<details>
+   <summary>Pokaż | Show me</summary>
+
+``` bash
+#The package can be added to Openwrt sources in two ways:
+
+cd feeds/luci/applications/
+git clone https://github.com/4IceG/luci-app-modemband.git
+cd ../../..
+./scripts feeds update -a; ./scripts/feeds install -a
+make menuconfig
+
+or e.g.
+
+cd packages/
+git clone https://github.com/4IceG/luci-app-modemband.git
+git pull
+make package/symlinks
+make menuconfig
+
+You may need to correct the file paths and the number of folders to look like this:
+feeds/luci/applications/luci-app-modemband/Makefile
+or
+packages/luci-app-modemband/Makefile
+
+Then you can compile the packages one by one, an example command:
+make V=s -j1 feeds/luci/applications/luci-app-modemband/compile
+```
+</details>
+
+### <img src="https://raw.githubusercontent.com/4IceG/Personal_data/master/dooffy_design_icons_EU_flags_United_Kingdom.png" height="24"> Preview / <img src="https://raw.githubusercontent.com/4IceG/Personal_data/master/dooffy_design_icons_EU_flags_Poland.png" height="24"> Podgląd
+
+> "Preferred LTE bands" window / Okno "Preferowane pasma LTE":
+
+![](https://github.com/4IceG/Personal_data/blob/master/zrzuty/1.0.21a.png?raw=true)
+
+> "Preferred 5G SA bands" window / Okno "Preferowane pasma 5G SA":
+
+![](https://github.com/4IceG/Personal_data/blob/master/zrzuty/1.0.21b.png?raw=true)
+
+> "Preferred 5G NSA bands" window / Okno "Preferowane pasma 5G NSA":
+
+![](https://github.com/4IceG/Personal_data/blob/master/zrzuty/1.0.21c.png?raw=true)
+
+> "Configuration" window / Okno "Konfiguracji":
+
+![](https://github.com/4IceG/Personal_data/blob/master/luci-app-modemband/modemband3.png?raw=true)
+
+> "Modem settings template" window / Okno "Szablon ustawień modemu":
+
+![](https://github.com/4IceG/Personal_data/blob/master/luci-app-modemband/modemband4.png?raw=true)
 
 
-## <img src="https://raw.githubusercontent.com/4IceG/Personal_data/master/dooffy_design_icons_EU_flags_United_Kingdom.png" height="32"> Thanks to / <img src="https://raw.githubusercontent.com/4IceG/Personal_data/master/dooffy_design_icons_EU_flags_Poland.png" height="32"> Podziękowania dla
+## <img src="https://raw.githubusercontent.com/4IceG/Personal_data/master/dooffy_design_icons_EU_flags_United_Kingdom.png" height="24"> Thanks to / <img src="https://raw.githubusercontent.com/4IceG/Personal_data/master/dooffy_design_icons_EU_flags_Poland.png" height="24"> Podziękowania dla
 - [obsy (Cezary Jackiewicz)](https://github.com/obsy)
